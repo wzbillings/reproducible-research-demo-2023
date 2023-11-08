@@ -1,0 +1,276 @@
+---
+title: "Notes on Reproducible Research"
+author: "Zane Billings"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+box::use(
+	rmarkdown,
+	markdown,
+	here
+)
+```
+
+# About me
+
+* PhD student in Epid/Bios working with Andreas Handel
+* Started using R (Markdown) in 2017.
+* I do pretty much all of my research in R / R Markdown / Quarto.
+* For more info see [https://wzbillings.com](https://wzbillings.com).
+
+# Learning goals
+
+By the end of this workshop you should be able to:
+
+1. Articulate the necessity of and basic concepts behind reproducible research;
+1. Start a new R project, and know the advantages of using one;
+1. Explain how the R history inhibits reproducible research';
+1. List which parts of the coding environment are real and which are temporary;
+1. Use good coding practices for handling dependencies in an R project;
+1. Organize your code into R Markdown and R script files, and justify your
+choice of organization;
+1. Rewrite R code in a modular format; and
+1. Make a plan for implementing these and other reproducible research tools in
+your own work.
+
+That's a lot of learning goals for this amount of time, so we better get
+started.
+
+# What is RR
+
+![](static/RR.jpg)
+
+Reproducible research is the idea that another researcher should be able to
+take your code and your data and reproduce your analytic results! (Different
+from, but related to, the also-important concept of replicability.)
+
+**What do you need to reproduce an analysis?**
+
+A lot of the time, people want you to start with 7000 things all at the same
+time and make your research automatically reproducible and use a bunch of
+different softwares. Reproducible research can often feel like an unattainable
+cliff that will make you think "ok, well I can't do all that, so why even try?"
+
+![Image [Source](https://hebdenbridgepicturehouse.co.uk/movies/everything-everywhere-all-at-once)](static/eeaao.jpg)
+
+</br>
+
+IMO this reproducible research stuff is often incredibly overwhelming. People
+seem to want you to transfer from SPSS to makefiles and automated code
+instantly. But I don't want you to do that.
+
+Instead of talking about "best" reproducible research practices, let's talk
+about "good enough" reproducible research practices. You know, stuff that
+will be good enough to get you through any federal funding mandates for
+reproducibility that come out.
+
+If you want to know more about the motivations for reproducible research and
+open science in general, you can see [my powerpoint for that on my
+website](https://wzbillings.com/presentations/open-science-ceid/). I also have
+a bit of a longer walkthrough of some RR concepts you can see
+[here](https://wzbillings.com/presentations/reu-workshop2023/), but that
+really needs to be cleaned up. I also have a page that I wrote for my adviser
+Andreas' online course, which you can find [here](https://andreashandel.github.io/MADAcourse/Open_Science.html).
+He edited that one, so it's maybe better.
+
+For an example of a reproducible research project, you can check out my
+collaborator [Dr. Brian McKay](https://www.fcs.uga.edu/people/bio/brian-mckay)'s 
+paper that you can find [on data 
+dryad](https://datadryad.org/stash/dataset/doi:10.5061/dryad.51c59zw4v). You
+can actually download all the data and code from here, and the last time I
+checked it, I could still get all the code to run on my computer.
+
+Let's go ahead and get started with those "good enough statistical practices."
+
+
+# R projects and aRson
+
+How does R find your files?
+
+To talk about that, we probably need to talk about what a file tree is.
+
+![A file tree example.](static/presentation4.webp)
+[Image source](https://informationtechnologyja.wordpress.com/2020/10/19/information-technology-grade-9-lesson-2-tree-directory-structure/)
+
+*R has a neat thing called the* ***working directory*** *that makes the
+whole tree easier to navigate.*
+
+For example, if I need you to go get something from my house, and you got
+no clue where that is, I have to tell you:
+1. Get to Athens, GA.
+1. Go to [Zane's House Address].
+1. Go inside and go upstairs.
+1. Go into the first room.
+1. Go to the bookshelf.
+1. Look at the third shelf.
+1. Grab the book I asked you for.
+
+Of course, if you already know where my house is, I can skip the first few
+bullet points -- this is the same thing that the working directory is doing.
+The working directory is an address in the file tree that says "OK R, when I
+tell you to look for a file, start here."
+
+```{r}
+getwd()
+# setwd()
+```
+
+**Can you imagine any problems with this?**
+
+</br>
+
+</br>
+
+What if our mutual friend has the same book, and you want to get it from their
+house? You can't follow the address to my house and get the book!!
+
+![](static/jenny.jpg)
+
+Solutions:
+* The old way was to use relative file paths, but this is really fragile.
+* New way: use an **R Project** and the `here` package.
+* I recommend that everything read
+[this blog post](https://www.tidyverse.org/blog/2017/12/workflow-vs-script/).
+
+```{r}
+here::here()
+```
+
+# Things that are real and not real
+
+Unfortunately, R has a tendency of asking whether you want to save your
+history when you close the program. You should always say NO! ***Why?***
+
+![](static/jenny2.jpg)
+
+This is discussed more in that blog post I already linked by Jenny Bryan.
+In short, **you want each run of your script to be independent**!
+
+**YOU SHOULD DO THIS ON EVERY COMPUTER YOU SET UP WITH R!!**
+
+```{r}
+# install.packages("usethis")
+usethis::use_blank_slate()
+```
+
+In the same line of thinking, it is tempting to think that all those things in
+your R environment are REAL. But they are NOT REAL. They are TEMPORARY things
+created by your code. And things in your R history are worse than not real,
+they are GHOSTS (which are not real and also scary).
+
+# Packages`::`functions, `box`, and `renv` 
+
+Often when people program in R, they type stuff like
+
+```r
+library(MASS)
+boxcox(mpg ~ wt, data = mtcars)
+```
+
+This is the easiest and most confusing way to deal with packages in R.
+If you follow the (appropriate) recommendation that all your `library()`
+invocations should go at the start of the script (*why* is this a good
+recommendation?), your code might have a lot of distance between the
+`library()` invocation, and the invocation of the function from that package.
+
+So it's always better (for your future self and for others) to explicitly
+write it like this.
+```r
+MASS::boxcox(...)
+```
+
+This solves multiple problems! For example, if you like tidyverse, but you do
+```r
+library(dplyr)
+library(MASS)
+
+dat <- select(mtcars, mpg, wt)
+```
+
+You will be surprised to see that your code doesn't work! But it would if you
+instead said `dplyr::select(...)`. So I recommend that you always, ALWAYS
+use the `::` when you call a function from a package.
+
+## `box`
+
+A lot of other languages force you to do this by default. For example, in Python
+if you wrote
+```python
+import statsmodels.api as sm
+Logit(y, x).fit()
+```
+
+you would get an error. You have to write
+```python
+import statsmodels.api as sm
+sm.Logit(y, x).fit()
+```
+instead. If you want to get away without the `sm.`, you have to do either
+```python
+from statsmodels.api import Logit
+Logit(y, x).fit()
+```
+or
+```python
+from statsmodels.api import *
+Logit(y, x).fit()
+```
+
+which imports all functions from `statsmodels.api` into your environment. Note
+that this is what R's `library()` function does by default, and this is
+generally not recommended in Python. R has some built in functionality like
+this, for example you can do
+
+```r
+library(dplyr, import.only = `%>%`)
+```
+
+Which lets you use the pipe operator in a normal way. A better way to list our
+dependencies in `R` and avoid filling up the global environment with stuff
+we won't use is the `box` package.
+
+```{r}
+box::use(dplyr)
+```
+
+We can look at their [README](https://github.com/klmr/box) for more info.
+
+## `renv`
+
+We still have the issue of installing packages in the first place though. If
+you send me your nicely formatted `R` project, I still don't have the packages
+you used, even if you put `box::use(my_cool_pkg)` at the top of your script.
+
+Suppose that you have `my_cool_pkg v1.4` installed on your computer. It works
+great, and you haven't even thought about updating it cause you never had any
+issues with it. However, you send me your code, and I run
+`install.packages("my_cool_pkg")` and it gives me `v2.3`. Somewhere along the
+line, they change the function `my_cool_pkg::fancy_regression()` so that
+it does regularized regression in `v2.3`, but in `v1.4` it still does plain
+unregularized regression. Then I'll get different results from you! And it
+will probably be hard to find out why.
+
+That's where `renv` comes in. `renv` is fantastic, but it can be a bit tricky
+--fortunately every version so far has gotten a bit easier to use. I recommend
+everyone read the [main page](https://rstudio.github.io/renv/articles/renv.html)
+of their documentation, but we can walk through an example as well.
+
+# Programming style and documentation
+
+Even if you don't follow anything else I say, this is the most important part!
+You can do all these reproducible research tricks, but they are still not
+very helpful if no one can understand what your code does.
+
+## Literate programming
+
+## R functions and scripts
+
+# Bibliographies and Zotero
+
+# Git
+
+# Recommended readings
+
+<!-- END OF FILE -->
