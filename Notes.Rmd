@@ -9,7 +9,8 @@ output: html_document
 box::use(
 	rmarkdown,
 	markdown,
-	here
+	here,
+	dplyr
 )
 ```
 
@@ -231,7 +232,7 @@ Which lets you use the pipe operator in a normal way. A better way to list our
 dependencies in `R` and avoid filling up the global environment with stuff
 we won't use is the `box` package.
 
-```{r}
+```r
 box::use(dplyr)
 ```
 
@@ -265,7 +266,117 @@ very helpful if no one can understand what your code does.
 
 ## Literate programming
 
+* **code** is interspersed with **text** (like in this document)
+* code comments explain HOW the code works, and text explains WHY you're
+writing particular code.
+* Think about it this way: if you took your most recent manuscript, and added
+in code chunks at each step of the methods and results, that would be
+literate programming.
+
+The main downside here is that code can often get very complicated. Here's an
+example. First I'll show the easy to read, good version.
+
+```r
+lm(mpg ~ wt, data = mtcars)
+```
+
+Now imagine if instead of that I did this.
+```r
+my_function <- function(formula, data, subset, weights, na.action, method = "qr", 
+	model = TRUE, x = FALSE, y = FALSE, qr = TRUE, singular.ok = TRUE, 
+	contrasts = NULL, offset, ...) 
+{
+	ret.x <- x
+	ret.y <- y
+	cl <- match.call()
+	mf <- match.call(expand.dots = FALSE)
+	m <- match(c("formula", "data", "subset", "weights", "na.action", 
+		"offset"), names(mf), 0L)
+	mf <- mf[c(1L, m)]
+	mf$drop.unused.levels <- TRUE
+	mf[[1L]] <- quote(stats::model.frame)
+	mf <- eval(mf, parent.frame())
+	if (method == "model.frame") 
+		return(mf)
+	else if (method != "qr") 
+		warning(gettextf("method = '%s' is not supported. Using 'qr'", 
+			method), domain = NA)
+	mt <- attr(mf, "terms")
+	y <- model.response(mf, "numeric")
+	w <- as.vector(model.weights(mf))
+	if (!is.null(w) && !is.numeric(w)) 
+		stop("'weights' must be a numeric vector")
+	offset <- model.offset(mf)
+	mlm <- is.matrix(y)
+	ny <- if (mlm) 
+		nrow(y)
+	else length(y)
+	if (!is.null(offset)) {
+		if (!mlm) 
+			offset <- as.vector(offset)
+		if (NROW(offset) != ny) 
+			stop(gettextf("number of offsets is %d, should equal %d (number of observations)", 
+				NROW(offset), ny), domain = NA)
+	}
+	if (is.empty.model(mt)) {
+		x <- NULL
+		z <- list(coefficients = if (mlm) matrix(NA_real_, 0, 
+			ncol(y)) else numeric(), residuals = y, fitted.values = 0 * 
+			y, weights = w, rank = 0L, df.residual = if (!is.null(w)) sum(w != 
+			0) else ny)
+		if (!is.null(offset)) {
+			z$fitted.values <- offset
+			z$residuals <- y - offset
+		}
+	}
+	else {
+		x <- model.matrix(mt, mf, contrasts)
+		z <- if (is.null(w)) 
+			lm.fit(x, y, offset = offset, singular.ok = singular.ok, 
+				...)
+		else lm.wfit(x, y, w, offset = offset, singular.ok = singular.ok, 
+			...)
+	}
+	class(z) <- c(if (mlm) "mlm", "lm")
+	z$na.action <- attr(mf, "na.action")
+	z$offset <- offset
+	z$contrasts <- attr(x, "contrasts")
+	z$xlevels <- .getXlevels(mt, mf)
+	z$call <- cl
+	z$terms <- mt
+	if (model) 
+		z$model <- mf
+	if (ret.x) 
+		z$x <- x
+	if (ret.y) 
+		z$y <- y
+	if (!qr) 
+		z$qr <- NULL
+	z
+}
+
+my_function(mpg ~ wt, data = mtcars)
+```
+
+These will give you the exact same output, but it's pretty clear why you
+would want to use one instead of the other, right? This is demonstrating the
+importance of **scripts** and **functions**!
+
+There are other options for literate programming, but right now the standout
+platform is **Quarto**. Quarto is newer and thus somewhat more buggy and less
+feature-full than R Markdown. And you have to install another program. But I
+highly recommend Quarto. R markdown, Jupyter, and iJulia/Pluto.jl are all
+pretty good and also free.
+
 ## R functions and scripts
+
+* A **function** is a modular piece of code that you can reuse without typing
+the entire code chunk out a second time.
+* A **script** is a file that contains R code and nothing else.
+
+A good design pattern is to organize your code into functions, your functions
+into scripts, and then `source()` those scripts into your literate programming
+documents.
 
 # Bibliographies and Zotero
 
