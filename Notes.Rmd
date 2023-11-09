@@ -9,8 +9,7 @@ output: html_document
 box::use(
 	rmarkdown,
 	markdown,
-	here,
-	dplyr
+	here
 )
 ```
 
@@ -368,6 +367,13 @@ feature-full than R Markdown. And you have to install another program. But I
 highly recommend Quarto. R markdown, Jupyter, and iJulia/Pluto.jl are all
 pretty good and also free.
 
+## Specific information for R markdown
+
+* [YAML header](https://zsmith27.github.io/rmarkdown_crash-course/lesson-4-yaml-headers.html)
+* [Code chunks](https://rmarkdown.rstudio.com/lesson-3.html)
+* [Markdown formatting](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) -- R Markdown uses "GitHub Flavored Markdown" but has some support for
+["Pandoc-flavored" markdown too.](https://garrettgman.github.io/rmarkdown/authoring_pandoc_markdown.html)
+
 ## R functions and scripts
 
 * A **function** is a modular piece of code that you can reuse without typing
@@ -378,10 +384,58 @@ A good design pattern is to organize your code into functions, your functions
 into scripts, and then `source()` those scripts into your literate programming
 documents.
 
+Of course I think it's easier to learn by example instead of by me talking
+about it in these notes.
+
 # Bibliographies and Zotero
+
+* Bibliographies are implemented seamlessly into R Markdown and Quarto via
+**bibTeX**. Fortunately, if you don't know bibTeX you don't have to learn it.
+* [Zotero](https://www.zotero.org/) is a free program which allows for easy
+managing and syncing of bibliographies.
+* The `csl` file controls the appearance of your bibliography. You can find one
+for pretty much any journal [here](https://www.zotero.org/styles).
+* I highly recommend the [better BibTeX](https://retorque.re/zotero-better-bibtex/) plugin as well.
+* The R Markdown cookbook has a [fairly comprehensive section](https://bookdown.org/yihui/rmarkdown-cookbook/bibliography.html) on bibliographies. There is a similar page for Quarto.
 
 # Git
 
+![](static/phd_versioncontrol.gif)
+
+* Git is complicated, there is no denying. But it is also the easiest
+version control system.
+* Even installing Git is complicated. I recommend following along with
+Jenny Bryan's book [Happy Git with R](https://happygitwithr.com/).
+* We'll talk about the very basics.
+
 # Recommended readings
+
+* Reproducible research in general:
+	* [Best practices for statistical computing](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.1001745)
+	* [Good enough practices for statistical computing](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510) (the main inspiration for
+this workshop
+	* MADA pages on [reproducibility](https://andreashandel.github.io/MADAcourse/Tools_Reproducibility.html) and [open science](https://andreashandel.github.io/MADAcourse/Open_Science.html).
+* R Programming
+	* Hadley Wickham's book [R for Data Science](https://r4ds.hadley.nz/) is quite good, but focuses mainly on "how do I program in R" and not "how do I make
+	my code better". But in general it will help with both.
+	* The [tidyverse style guide](https://style.tidyverse.org/)
+	* [Section 2 of R4Epi](https://www.r4epi.com/r-scripts)
+	* Intermediate or advanced R users may appreciate [The R Inferno](https://www.burns-stat.com/pages/Tutor/R_inferno.pdf) or Hadley Wickham's [Advanced R](https://adv-r.hadley.nz/) or Norman Matloff's book "The
+	Art of R Programming", which is not free but is findable online.
+* R Markdown
+	* [The R Markdown cookbook](https://bookdown.org/yihui/rmarkdown-cookbook/)
+	* [Bookdown book](https://bookdown.org/yihui/bookdown/) (Bookdown is an
+	extension to R Markdown that provides many useful features for manuscript
+	writing. This book has a lot of useful advice but if you are serious about
+	writing manuscripts with literate programming, I do recommend considering
+	Quarto as well.)
+* Quarto:
+	* [Getting started](https://quarto.org/docs/get-started/)
+	* [Tutorial](https://quarto.org/docs/get-started/hello/rstudio.html)
+* Git and GitHub:
+	* [https://rafalab.dfci.harvard.edu/dsbook/git.html](https://rafalab.dfci.harvard.edu/dsbook/git.html)
+	* [https://peerj.com/preprints/3159/](https://peerj.com/preprints/3159/)
+	* [the Oh my Git! game](https://ohmygit.org/)
+	* [MADA course page on Git](https://andreashandel.github.io/MADAcourse/Tools_Github_Introduction.html)
 
 <!-- END OF FILE -->
