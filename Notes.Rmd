@@ -160,6 +160,10 @@ your R environment are REAL. But they are NOT REAL. They are TEMPORARY things
 created by your code. And things in your R history are worse than not real,
 they are GHOSTS (which are not real and also scary).
 
+![](static/atla.PNG)
+
+**Example project:** https://github.com/wzbillings/Symptom-Agreement-Public 
+
 # Packages`::`functions, `box`, and `renv` 
 
 Often when people program in R, they type stuff like
