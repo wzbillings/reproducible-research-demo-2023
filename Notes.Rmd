@@ -2,7 +2,9 @@
 title: "Notes on Reproducible Research"
 author: "Zane Billings"
 date: "`r Sys.Date()`"
-output: html_document
+output:
+  html_document: default
+  word_document: default
 ---
 
 ```{r setup, include = FALSE}
